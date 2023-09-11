@@ -25,6 +25,14 @@ class UnidadesController < ApplicationController
 
     respond_to do |format|
       if @unidade.save
+        # Crie um cliente do SQS
+        sqs = Aws::SQS::Client.new
+
+        # Envie uma mensagem para a fila
+        queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
+        message_body = @unidade.as_json.merge({ action: 'CREATED' })
+        sqs.send_message(queue_url: queue_url, message_body: message_body.to_s)
+
         format.html { redirect_to unidade_url(@unidade), notice: "Unidade was successfully created." }
         format.json { render :show, status: :created, location: @unidade }
       else
