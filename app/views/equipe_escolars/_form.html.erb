@@ -1,0 +1,32 @@
+<%= form_with(model: equipe_escolar, local: true) do |form| %>
+  <% if equipe_escolar.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(equipe_escolar.errors.count, "error") %> prohibited this equipe_escolar from being saved:</h2>
+
+      <ul>
+        <% equipe_escolar.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :nome %>
+    <%= form.text_field :nome %>
+  </div>
+
+  <div class="field">
+    <%= form.label :cargo %>
+    <%= form.text_field :cargo %>
+  </div>
+
+  <div class="field">
+    <%= form.label :turma_id %>
+    <%= form.text_field :turma_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

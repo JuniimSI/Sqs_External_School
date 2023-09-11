@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Equipe Escolars</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Cargo</th>
+      <th>Turma</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @equipe_escolars.each do |equipe_escolar| %>
+      <tr>
+        <td><%= equipe_escolar.nome %></td>
+        <td><%= equipe_escolar.cargo %></td>
+        <td><%= equipe_escolar.turma_id %></td>
+        <td><%= link_to 'Show', equipe_escolar %></td>
+        <td><%= link_to 'Edit', edit_equipe_escolar_path(equipe_escolar) %></td>
+        <td><%= link_to 'Destroy', equipe_escolar, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Equipe Escolar', new_equipe_escolar_path %>

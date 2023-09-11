@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Nome:</strong>
+  <%= @responsavel.nome %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @responsavel.email %>
+</p>
+
+<p>
+  <strong>Telefone:</strong>
+  <%= @responsavel.telefone %>
+</p>
+
+<p>
+  <strong>Aluno:</strong>
+  <%= @responsavel.aluno_id %>
+</p>
+
+<%= link_to 'Edit', edit_responsavel_path(@responsavel) %> |
+<%= link_to 'Back', responsavels_path %>
