@@ -25,6 +25,12 @@ class DisciplinasController < ApplicationController
 
     respond_to do |format|
       if @disciplina.save
+        sqs = Aws::SQS::Client.new
+
+        queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
+        message_body = @disciplina.as_json.merge({ type: 'Discipline', action: 'CREATE' })
+        sqs.send_message(queue_url: queue_url, message_body: message_body.to_s)
+
         format.html { redirect_to disciplina_url(@disciplina), notice: "Disciplina was successfully created." }
         format.json { render :show, status: :created, location: @disciplina }
       else
