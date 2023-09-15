@@ -28,10 +28,24 @@ class TurmasController < ApplicationController
         sqs = Aws::SQS::Client.new
 
         queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
-        message_body = @turma.as_json.merge({ type: 'Classroom', action: 'CREATE' })
-        sqs.send_message(queue_url: queue_url, message_body: message_body.to_s)
 
-        format.html { redirect_to turma_url(@turma), notice: "Turma was successfully created." }
+        classroom_params = turma_params.to_h.merge({ type: 'Classroom', action: 'CREATE' })
+        classroom_attributes = {}
+
+        classroom_params.each do |key, value|
+          classroom_attributes[key] = {
+            data_type: 'String',
+            string_value: value
+          }
+        end
+
+        sqs.send_message(
+          queue_url: queue_url,
+          message_body: 'Classroom Created',
+          message_attributes: classroom_attributes
+        )
+
+        format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully created.' }
         format.json { render :show, status: :created, location: @turma }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -44,7 +58,7 @@ class TurmasController < ApplicationController
   def update
     respond_to do |format|
       if @turma.update(turma_params)
-        format.html { redirect_to turma_url(@turma), notice: "Turma was successfully updated." }
+        format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully updated.' }
         format.json { render :show, status: :ok, location: @turma }
       else
         format.html { render :edit, status: :unprocessable_entity }
