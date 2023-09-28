@@ -25,6 +25,8 @@ class AlunosController < ApplicationController
 
     respond_to do |format|
       if @aluno.save
+        ::SendSqsMessageService.new('Create', 'Student', @aluno, aluno_params.to_h).call
+
         format.html { redirect_to aluno_url(@aluno), notice: "Aluno was successfully created." }
         format.json { render :show, status: :created, location: @aluno }
       else
@@ -58,13 +60,13 @@ class AlunosController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_aluno
-      @aluno = Aluno.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_aluno
+    @aluno = Aluno.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def aluno_params
-      params.require(:aluno).permit(:nome, :data_nascimento, :turma_id)
-    end
+  # Only allow a list of trusted parameters through.
+  def aluno_params
+    params.require(:aluno).permit(:nome, :data_nascimento, :turma_id)
+  end
 end

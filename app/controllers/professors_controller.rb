@@ -25,6 +25,8 @@ class ProfessorsController < ApplicationController
 
     respond_to do |format|
       if @professor.save
+        ::SendSqsMessageService.new('Create', 'Teacher', @professor, professor_params.to_h).call
+
         format.html { redirect_to professor_url(@professor), notice: "Professor was successfully created." }
         format.json { render :show, status: :created, location: @professor }
       else

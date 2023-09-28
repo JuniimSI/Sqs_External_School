@@ -25,11 +25,7 @@ class DisciplinasController < ApplicationController
 
     respond_to do |format|
       if @disciplina.save
-        sqs = Aws::SQS::Client.new
-
-        queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
-        message_body = @disciplina.as_json.merge({ type: 'Discipline', action: 'CREATE' })
-        sqs.send_message(queue_url: queue_url, message_body: message_body.to_s)
+        ::SendSqsMessageService.new('Create', 'Discipline', @disciplina, disciplina_params.to_h).call
 
         format.html { redirect_to disciplina_url(@disciplina), notice: "Disciplina was successfully created." }
         format.json { render :show, status: :created, location: @disciplina }
@@ -64,13 +60,13 @@ class DisciplinasController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_disciplina
-      @disciplina = Disciplina.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_disciplina
+    @disciplina = Disciplina.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def disciplina_params
-      params.require(:disciplina).permit(:nome, :descricao)
-    end
+  # Only allow a list of trusted parameters through.
+  def disciplina_params
+    params.require(:disciplina).permit(:nome, :descricao)
+  end
 end

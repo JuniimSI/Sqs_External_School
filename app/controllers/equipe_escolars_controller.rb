@@ -25,6 +25,8 @@ class EquipeEscolarsController < ApplicationController
 
     respond_to do |format|
       if @equipe_escolar.save
+        ::SendSqsMessageService.new('Create', 'Team', @equipe_escolar, equipe_escolar_params.to_h).call
+
         format.html { redirect_to equipe_escolar_url(@equipe_escolar), notice: "Equipe escolar was successfully created." }
         format.json { render :show, status: :created, location: @equipe_escolar }
       else

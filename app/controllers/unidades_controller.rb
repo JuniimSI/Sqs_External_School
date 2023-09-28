@@ -25,13 +25,9 @@ class UnidadesController < ApplicationController
 
     respond_to do |format|
       if @unidade.save
-        sqs = Aws::SQS::Client.new
+        ::SendSqsMessageService.new('Create', 'Headquarter', @unidade, unidade_params.to_h).call
 
-        queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
-        message_body = @unidade.as_json.merge({ type: 'Headquarter', action: 'CREATE' })
-        sqs.send_message(queue_url: queue_url, message_body: message_body.to_s)
-
-        format.html { redirect_to unidade_url(@unidade), notice: "Unidade was successfully created." }
+        format.html { redirect_to unidade_url(@unidade), notice: 'Unidade was successfully created.' }
         format.json { render :show, status: :created, location: @unidade }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -64,13 +60,13 @@ class UnidadesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_unidade
-      @unidade = Unidade.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_unidade
+    @unidade = Unidade.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def unidade_params
-      params.require(:unidade).permit(:nome, :endereco, :telefone)
-    end
+  # Only allow a list of trusted parameters through.
+  def unidade_params
+    params.require(:unidade).permit(:nome, :endereco, :telefone)
+  end
 end

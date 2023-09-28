@@ -25,6 +25,8 @@ class ResponsavelsController < ApplicationController
 
     respond_to do |format|
       if @responsavel.save
+        ::SendSqsMessageService.new('Create', 'Responsible', @responsavel, responsavel_params.to_h).call
+
         format.html { redirect_to responsavel_url(@responsavel), notice: "Responsavel was successfully created." }
         format.json { render :show, status: :created, location: @responsavel }
       else
@@ -58,13 +60,13 @@ class ResponsavelsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_responsavel
-      @responsavel = Responsavel.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_responsavel
+    @responsavel = Responsavel.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def responsavel_params
-      params.require(:responsavel).permit(:nome, :email, :telefone, :aluno_id)
-    end
+  # Only allow a list of trusted parameters through.
+  def responsavel_params
+    params.require(:responsavel).permit(:nome, :email, :telefone, :aluno_id)
+  end
 end

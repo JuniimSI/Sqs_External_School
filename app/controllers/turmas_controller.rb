@@ -25,25 +25,7 @@ class TurmasController < ApplicationController
 
     respond_to do |format|
       if @turma.save
-        sqs = Aws::SQS::Client.new
-
-        queue_url = 'https://sqs.us-east-1.amazonaws.com/369869160593/QueueSQS'
-
-        classroom_params = turma_params.to_h.merge({ type: 'Classroom', action: 'CREATE' })
-        classroom_attributes = {}
-
-        classroom_params.each do |key, value|
-          classroom_attributes[key] = {
-            data_type: 'String',
-            string_value: value
-          }
-        end
-
-        sqs.send_message(
-          queue_url: queue_url,
-          message_body: 'Classroom Created',
-          message_attributes: classroom_attributes
-        )
+        ::SendSqsMessageService.new('Create', 'Classroom', @turma, turma_params.to_h).call
 
         format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully created.' }
         format.json { render :show, status: :created, location: @turma }
@@ -78,13 +60,13 @@ class TurmasController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_turma
-      @turma = Turma.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_turma
+    @turma = Turma.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def turma_params
-      params.require(:turma).permit(:nome, :descricao)
-    end
+  # Only allow a list of trusted parameters through.
+  def turma_params
+    params.require(:turma).permit(:nome, :descricao)
+  end
 end
