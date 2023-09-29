@@ -25,7 +25,7 @@ class TurmasController < ApplicationController
 
     respond_to do |format|
       if @turma.save
-        ::SendSqsMessageService.new('Create', 'Classroom', @turma, turma_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Classroom', @turma, turma_params.to_h).call
 
         format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully created.' }
         format.json { render :show, status: :created, location: @turma }
@@ -40,7 +40,7 @@ class TurmasController < ApplicationController
   def update
     respond_to do |format|
       if @turma.update(turma_params)
-        ::SendSqsMessageService.new('Update', 'Classroom', @turma, turma_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Classroom', @turma, turma_params.to_h).call
 
         format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully updated.' }
         format.json { render :show, status: :ok, location: @turma }
@@ -55,7 +55,7 @@ class TurmasController < ApplicationController
   def destroy
     respond_to do |format|
       if @turma.destroy
-        ::SendSqsMessageService.new('Delete', 'Classroom', @turma, {}).call
+        ::SendSqsMessageService.new('delete', 'Classroom', @turma, {}).call
 
         format.html { redirect_to turmas_url, notice: 'turma was successfully destroyed.' }
         format.json { head :no_content }

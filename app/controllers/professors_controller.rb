@@ -25,7 +25,7 @@ class ProfessorsController < ApplicationController
 
     respond_to do |format|
       if @professor.save
-        ::SendSqsMessageService.new('Create', 'Teacher', @professor, professor_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Teacher', @professor, professor_params.to_h).call
 
         format.html { redirect_to professor_url(@professor), notice: "Professor was successfully created." }
         format.json { render :show, status: :created, location: @professor }
@@ -40,7 +40,7 @@ class ProfessorsController < ApplicationController
   def update
     respond_to do |format|
       if @professor.update(professor_params)
-        ::SendSqsMessageService.new('Update', 'Teacher', @professor, professor_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Teacher', @professor, professor_params.to_h).call
 
         format.html { redirect_to professor_url(@professor), notice: "Professor was successfully updated." }
         format.json { render :show, status: :ok, location: @professor }
@@ -55,7 +55,7 @@ class ProfessorsController < ApplicationController
   def destroy
     respond_to do |format|
       if @professor.destroy
-        ::SendSqsMessageService.new('Delete', 'Teacher', @professor, {}).call
+        ::SendSqsMessageService.new('delete', 'Teacher', @professor, {}).call
 
         format.html { redirect_to professors_url, notice: 'professor was successfully destroyed.' }
         format.json { head :no_content }

@@ -25,7 +25,7 @@ class ResponsavelsController < ApplicationController
 
     respond_to do |format|
       if @responsavel.save
-        ::SendSqsMessageService.new('Create', 'Responsible', @responsavel, responsavel_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Responsible', @responsavel, responsavel_params.to_h).call
 
         format.html { redirect_to responsavel_url(@responsavel), notice: "Responsavel was successfully created." }
         format.json { render :show, status: :created, location: @responsavel }
@@ -40,7 +40,7 @@ class ResponsavelsController < ApplicationController
   def update
     respond_to do |format|
       if @responsavel.update(responsavel_params)
-        ::SendSqsMessageService.new('Update', 'Responsible', @responsavel, responsavel_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Responsible', @responsavel, responsavel_params.to_h).call
 
         format.html { redirect_to responsavel_url(@responsavel), notice: "Responsavel was successfully updated." }
         format.json { render :show, status: :ok, location: @responsavel }
@@ -55,7 +55,7 @@ class ResponsavelsController < ApplicationController
   def destroy
     respond_to do |format|
       if @responsavel.destroy
-        ::SendSqsMessageService.new('Delete', 'Responsible', @responsavel, {}).call
+        ::SendSqsMessageService.new('delete', 'Responsible', @responsavel, {}).call
 
         format.html { redirect_to responsavels_url, notice: 'responsavel was successfully destroyed.' }
         format.json { head :no_content }

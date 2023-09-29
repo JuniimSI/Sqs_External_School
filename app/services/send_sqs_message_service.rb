@@ -12,16 +12,17 @@ class SendSqsMessageService
   end
 
   def call
-    @params.merge({ type: @klass, action: @kind, legacy_id: @object.id.to_s })
+    @params.merge!({ 
+      entity: @klass,
+      kind: @kind, 
+      school_token:  @school_token,
+      legacy_id: @object.id.to_s 
+    })
     attributes = {}
 
     @params.each do |key, value|
       attributes[key] = { data_type: 'String', string_value: value }
     end
-
-    attributes.merge!(
-      school_token: { data_type: 'String', string_value: @school_token }
-    )
 
     @sqs.send_message(
       queue_url: @queue_url,

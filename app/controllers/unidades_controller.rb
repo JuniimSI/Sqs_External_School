@@ -25,7 +25,7 @@ class UnidadesController < ApplicationController
 
     respond_to do |format|
       if @unidade.save
-        ::SendSqsMessageService.new('Create', 'Headquarter', @unidade, unidade_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Headquarter', @unidade, unidade_params.to_h).call
 
         format.html { redirect_to unidade_url(@unidade), notice: 'Unidade was successfully created.' }
         format.json { render :show, status: :created, location: @unidade }
@@ -40,7 +40,7 @@ class UnidadesController < ApplicationController
   def update
     respond_to do |format|
       if @unidade.update(unidade_params)
-        ::SendSqsMessageService.new('Update', 'Headquarter', @unidade, unidade_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Headquarter', @unidade, unidade_params.to_h).call
 
         format.html { redirect_to unidade_url(@unidade), notice: "Unidade was successfully updated." }
         format.json { render :show, status: :ok, location: @unidade }
@@ -55,7 +55,7 @@ class UnidadesController < ApplicationController
   def destroy
     respond_to do |format|
       if @unidade.destroy
-        ::SendSqsMessageService.new('Delete', 'Headquarter', @unidade, {}).call
+        ::SendSqsMessageService.new('delete', 'Headquarter', @unidade, {}).call
 
         format.html { redirect_to unidades_url, notice: 'Unidade was successfully destroyed.' }
         format.json { head :no_content }

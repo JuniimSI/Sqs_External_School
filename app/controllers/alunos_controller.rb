@@ -25,7 +25,7 @@ class AlunosController < ApplicationController
 
     respond_to do |format|
       if @aluno.save
-        ::SendSqsMessageService.new('Create', 'Student', @aluno, aluno_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Student', @aluno, aluno_params.to_h).call
 
         format.html { redirect_to aluno_url(@aluno), notice: "Aluno was successfully created." }
         format.json { render :show, status: :created, location: @aluno }
@@ -40,7 +40,7 @@ class AlunosController < ApplicationController
   def update
     respond_to do |format|
       if @aluno.update(aluno_params)
-        ::SendSqsMessageService.new('Update', 'Student', @aluno, aluno_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Student', @aluno, aluno_params.to_h).call
 
         format.html { redirect_to aluno_url(@aluno), notice: "Aluno was successfully updated." }
         format.json { render :show, status: :ok, location: @aluno }
@@ -55,7 +55,7 @@ class AlunosController < ApplicationController
   def destroy
     respond_to do |format|
       if @aluno.destroy
-        ::SendSqsMessageService.new('Delete', 'Student', @aluno, {}).call
+        ::SendSqsMessageService.new('delete', 'Student', @aluno, {}).call
 
         format.html { redirect_to alunos_url, notice: 'aluno was successfully destroyed.' }
         format.json { head :no_content }
@@ -66,12 +66,11 @@ class AlunosController < ApplicationController
   end
 
   private
-  # Use callbacks to share common setup or constraints between actions.
+
   def set_aluno
     @aluno = Aluno.find(params[:id])
   end
 
-  # Only allow a list of trusted parameters through.
   def aluno_params
     params.require(:aluno).permit(:nome, :turma_id)
   end

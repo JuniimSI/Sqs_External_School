@@ -25,7 +25,7 @@ class DisciplinasController < ApplicationController
 
     respond_to do |format|
       if @disciplina.save
-        ::SendSqsMessageService.new('Create', 'Discipline', @disciplina, disciplina_params.to_h).call
+        ::SendSqsMessageService.new('create', 'Discipline', @disciplina, disciplina_params.to_h).call
 
         format.html { redirect_to disciplina_url(@disciplina), notice: "Disciplina was successfully created." }
         format.json { render :show, status: :created, location: @disciplina }
@@ -40,7 +40,7 @@ class DisciplinasController < ApplicationController
   def update
     respond_to do |format|
       if @disciplina.update(disciplina_params)
-        ::SendSqsMessageService.new('Update', 'Discipline', @disciplina, disciplina_params.to_h).call
+        ::SendSqsMessageService.new('update', 'Discipline', @disciplina, disciplina_params.to_h).call
 
         format.html { redirect_to disciplina_url(@disciplina), notice: "Disciplina was successfully updated." }
         format.json { render :show, status: :ok, location: @disciplina }
@@ -55,7 +55,7 @@ class DisciplinasController < ApplicationController
   def destroy
     respond_to do |format|
       if @disciplina.destroy
-        ::SendSqsMessageService.new('Delete', 'Discipline', @disciplina, {}).call
+        ::SendSqsMessageService.new('delete', 'Discipline', @disciplina, {}).call
 
         format.html { redirect_to disciplinas_url, notice: 'disciplina was successfully destroyed.' }
         format.json { head :no_content }
