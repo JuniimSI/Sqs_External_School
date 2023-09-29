@@ -40,6 +40,8 @@ class ProfessorsController < ApplicationController
   def update
     respond_to do |format|
       if @professor.update(professor_params)
+        ::SendSqsMessageService.new('Update', 'Teacher', @professor, professor_params.to_h).call
+
         format.html { redirect_to professor_url(@professor), notice: "Professor was successfully updated." }
         format.json { render :show, status: :ok, location: @professor }
       else
@@ -51,22 +53,25 @@ class ProfessorsController < ApplicationController
 
   # DELETE /professors/1 or /professors/1.json
   def destroy
-    @professor.destroy
-
     respond_to do |format|
-      format.html { redirect_to professors_url, notice: "Professor was successfully destroyed." }
-      format.json { head :no_content }
+      if @professor.destroy
+        ::SendSqsMessageService.new('Delete', 'Teacher', @professor, {}).call
+
+        format.html { redirect_to professors_url, notice: 'professor was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @professor.errors, status: :unprocessable_entity }
+      end
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_professor
-      @professor = Professor.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def professor_params
-      params.require(:professor).permit(:nome, :email, :telefone, :turma_id)
-    end
+  def set_professor
+    @professor = Professor.find(params[:id])
+  end
+
+  def professor_params
+    params.require(:professor).permit(:nome, :email, :telefone, :turma_id)
+  end
 end

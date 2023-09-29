@@ -40,6 +40,8 @@ class UnidadesController < ApplicationController
   def update
     respond_to do |format|
       if @unidade.update(unidade_params)
+        ::SendSqsMessageService.new('Update', 'Headquarter', @unidade, unidade_params.to_h).call
+
         format.html { redirect_to unidade_url(@unidade), notice: "Unidade was successfully updated." }
         format.json { render :show, status: :ok, location: @unidade }
       else
@@ -51,11 +53,15 @@ class UnidadesController < ApplicationController
 
   # DELETE /unidades/1 or /unidades/1.json
   def destroy
-    @unidade.destroy
-
     respond_to do |format|
-      format.html { redirect_to unidades_url, notice: "Unidade was successfully destroyed." }
-      format.json { head :no_content }
+      if @unidade.destroy
+        ::SendSqsMessageService.new('Delete', 'Headquarter', @unidade, {}).call
+
+        format.html { redirect_to unidades_url, notice: 'Unidade was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @unidade.errors, status: :unprocessable_entity }
+      end
     end
   end
 

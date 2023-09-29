@@ -40,6 +40,8 @@ class EquipeEscolarsController < ApplicationController
   def update
     respond_to do |format|
       if @equipe_escolar.update(equipe_escolar_params)
+        ::SendSqsMessageService.new('Update', 'Team', @equipe_escolar, equipe_escolar_params.to_h).call
+
         format.html { redirect_to equipe_escolar_url(@equipe_escolar), notice: "Equipe escolar was successfully updated." }
         format.json { render :show, status: :ok, location: @equipe_escolar }
       else
@@ -51,11 +53,15 @@ class EquipeEscolarsController < ApplicationController
 
   # DELETE /equipe_escolars/1 or /equipe_escolars/1.json
   def destroy
-    @equipe_escolar.destroy
-
     respond_to do |format|
-      format.html { redirect_to equipe_escolars_url, notice: "Equipe escolar was successfully destroyed." }
-      format.json { head :no_content }
+      if @equipe_escolar.destroy
+        ::SendSqsMessageService.new('Delete', 'Team', @equipe_escolar, {}).call
+
+        format.html { redirect_to equipe_escolars_url, notice: 'equipe_escolar was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @equipe_escolar.errors, status: :unprocessable_entity }
+      end
     end
   end
 

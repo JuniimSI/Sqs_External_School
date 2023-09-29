@@ -40,6 +40,8 @@ class TurmasController < ApplicationController
   def update
     respond_to do |format|
       if @turma.update(turma_params)
+        ::SendSqsMessageService.new('Update', 'Classroom', @turma, turma_params.to_h).call
+
         format.html { redirect_to turma_url(@turma), notice: 'Turma was successfully updated.' }
         format.json { render :show, status: :ok, location: @turma }
       else
@@ -51,11 +53,15 @@ class TurmasController < ApplicationController
 
   # DELETE /turmas/1 or /turmas/1.json
   def destroy
-    @turma.destroy
-
     respond_to do |format|
-      format.html { redirect_to turmas_url, notice: "Turma was successfully destroyed." }
-      format.json { head :no_content }
+      if @turma.destroy
+        ::SendSqsMessageService.new('Delete', 'Classroom', @turma, {}).call
+
+        format.html { redirect_to turmas_url, notice: 'turma was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @turma.errors, status: :unprocessable_entity }
+      end
     end
   end
 

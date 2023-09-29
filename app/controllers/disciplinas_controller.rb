@@ -40,6 +40,8 @@ class DisciplinasController < ApplicationController
   def update
     respond_to do |format|
       if @disciplina.update(disciplina_params)
+        ::SendSqsMessageService.new('Update', 'Discipline', @disciplina, disciplina_params.to_h).call
+
         format.html { redirect_to disciplina_url(@disciplina), notice: "Disciplina was successfully updated." }
         format.json { render :show, status: :ok, location: @disciplina }
       else
@@ -51,11 +53,15 @@ class DisciplinasController < ApplicationController
 
   # DELETE /disciplinas/1 or /disciplinas/1.json
   def destroy
-    @disciplina.destroy
-
     respond_to do |format|
-      format.html { redirect_to disciplinas_url, notice: "Disciplina was successfully destroyed." }
-      format.json { head :no_content }
+      if @disciplina.destroy
+        ::SendSqsMessageService.new('Delete', 'Discipline', @disciplina, {}).call
+
+        format.html { redirect_to disciplinas_url, notice: 'disciplina was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @disciplina.errors, status: :unprocessable_entity }
+      end
     end
   end
 

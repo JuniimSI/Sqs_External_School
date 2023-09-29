@@ -40,6 +40,8 @@ class AlunosController < ApplicationController
   def update
     respond_to do |format|
       if @aluno.update(aluno_params)
+        ::SendSqsMessageService.new('Update', 'Student', @aluno, aluno_params.to_h).call
+
         format.html { redirect_to aluno_url(@aluno), notice: "Aluno was successfully updated." }
         format.json { render :show, status: :ok, location: @aluno }
       else
@@ -51,11 +53,15 @@ class AlunosController < ApplicationController
 
   # DELETE /alunos/1 or /alunos/1.json
   def destroy
-    @aluno.destroy
-
     respond_to do |format|
-      format.html { redirect_to alunos_url, notice: "Aluno was successfully destroyed." }
-      format.json { head :no_content }
+      if @aluno.destroy
+        ::SendSqsMessageService.new('Delete', 'Student', @aluno, {}).call
+
+        format.html { redirect_to alunos_url, notice: 'aluno was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @aluno.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -67,6 +73,6 @@ class AlunosController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def aluno_params
-    params.require(:aluno).permit(:nome, :data_nascimento, :turma_id)
+    params.require(:aluno).permit(:nome, :turma_id)
   end
 end

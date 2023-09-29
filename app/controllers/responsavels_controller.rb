@@ -40,6 +40,8 @@ class ResponsavelsController < ApplicationController
   def update
     respond_to do |format|
       if @responsavel.update(responsavel_params)
+        ::SendSqsMessageService.new('Update', 'Responsible', @responsavel, responsavel_params.to_h).call
+
         format.html { redirect_to responsavel_url(@responsavel), notice: "Responsavel was successfully updated." }
         format.json { render :show, status: :ok, location: @responsavel }
       else
@@ -51,11 +53,15 @@ class ResponsavelsController < ApplicationController
 
   # DELETE /responsavels/1 or /responsavels/1.json
   def destroy
-    @responsavel.destroy
-
     respond_to do |format|
-      format.html { redirect_to responsavels_url, notice: "Responsavel was successfully destroyed." }
-      format.json { head :no_content }
+      if @responsavel.destroy
+        ::SendSqsMessageService.new('Delete', 'Responsible', @responsavel, {}).call
+
+        format.html { redirect_to responsavels_url, notice: 'responsavel was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.json { render json: @responsavel.errors, status: :unprocessable_entity }
+      end
     end
   end
 
